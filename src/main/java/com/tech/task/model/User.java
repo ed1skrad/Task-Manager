@@ -92,14 +92,6 @@ public class User implements UserDetails {
         this.password = password;
     }
 
-    public List<Role> getRole() {
-        return roles;
-    }
-
-    public void setRole(List<Role> roles) {
-        this.roles = roles;
-    }
-
     public List<Role> getRoles() {
         return roles;
     }

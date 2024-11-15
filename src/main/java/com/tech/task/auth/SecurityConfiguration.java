@@ -1,8 +1,6 @@
 package com.tech.task.auth;
 
-import by.vvake.master.security.service.UserService;
-import by.vvake.master.security.service.oauth2.OAuth2LoginSuccessHandler;
-import by.vvake.master.security.service.oauth2.vk.CustomOAuth2AccessTokenResponseClient;
+import com.tech.task.service.UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -15,10 +13,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.client.endpoint.OAuth2AccessTokenResponseClient;
-import org.springframework.security.oauth2.client.endpoint.OAuth2AuthorizationCodeGrantRequest;
-import org.springframework.security.oauth2.client.web.OAuth2LoginAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 
 import java.util.List;
@@ -32,19 +28,12 @@ public class SecurityConfiguration {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final UserService userService;
-    private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
 
-    public SecurityConfiguration(JwtAuthenticationFilter jwtAuthenticationFilter, UserService userService, OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler, CustomAuthenticationEntryPoint customAuthenticationEntryPoint) {
+    public SecurityConfiguration(JwtAuthenticationFilter jwtAuthenticationFilter, UserService userService, CustomAuthenticationEntryPoint customAuthenticationEntryPoint) {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
         this.userService = userService;
-        this.oAuth2LoginSuccessHandler = oAuth2LoginSuccessHandler;
         this.customAuthenticationEntryPoint = customAuthenticationEntryPoint;
-    }
-
-    @Bean
-    public OAuth2AccessTokenResponseClient<OAuth2AuthorizationCodeGrantRequest> accessTokenResponseClient() {
-        return new CustomOAuth2AccessTokenResponseClient();
     }
 
     @Bean
@@ -63,14 +52,7 @@ public class SecurityConfiguration {
                         .anyRequest().authenticated())
                 .sessionManagement(manager -> manager.sessionCreationPolicy(STATELESS))
                 .authenticationProvider(authenticationProvider())
-                .addFilterBefore(jwtAuthenticationFilter, OAuth2LoginAuthenticationFilter.class)
-                .oauth2Login(oauth2Login ->
-                        oauth2Login
-                                .successHandler(oAuth2LoginSuccessHandler)
-                                .tokenEndpoint(tokenEndpointConfig ->
-                                        tokenEndpointConfig.accessTokenResponseClient(accessTokenResponseClient())
-                                )
-                )
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling(exceptionHandling ->
                     exceptionHandling.authenticationEntryPoint(customAuthenticationEntryPoint)
                 );

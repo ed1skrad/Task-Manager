@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 import java.util.Optional;
 
+@Transactional
 public class RefreshTokenService {
 
     private final RefreshTokenRepository refreshTokenRepository;
@@ -37,16 +38,13 @@ public class RefreshTokenService {
         refreshToken.setToken(token);
         refreshToken.setExpiryDate(Instant.now().plusMillis(60 * 60 * 24 * 7 * 1000));
         refreshTokenRepository.save(refreshToken);
-        System.out.println("Generated refresh token: " + token);
         return token;
     }
 
     public boolean isRefreshTokenValid(String token) {
         Optional<RefreshToken> refreshTokenOptional = refreshTokenRepository.findByToken(token);
-        System.out.println("Refresh token found: " + refreshTokenOptional.isPresent());
         if (refreshTokenOptional.isPresent()) {
             RefreshToken refreshToken = refreshTokenOptional.get();
-            System.out.println("Refresh token expiry date: " + refreshToken.getExpiryDate());
             return !refreshToken.getExpiryDate().isBefore(Instant.now());
         }
         return false;
@@ -64,12 +62,10 @@ public class RefreshTokenService {
                 .orElseThrow(() -> new InvalidRefreshTokenException("Invalid refresh token"));
     }
 
-    @Transactional
     public void deleteRefreshToken(User user) {
         refreshTokenRepository.deleteByUser(user);
     }
 
-    @Transactional
     public void deleteRefreshTokenById(Long id){
         refreshTokenRepository.deleteById(id);
     }
