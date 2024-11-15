@@ -1,5 +1,6 @@
 package com.tech.task.service.impl;
 
+import com.tech.task.dto.response.JwtAuthenticationResponse;
 import com.tech.task.exception.InvalidRefreshTokenException;
 import com.tech.task.model.User;
 import com.tech.task.model.token.RefreshToken;
@@ -59,6 +60,19 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
         return refreshTokenRepository.findByToken(refreshToken)
                 .map(t -> jwtService.generateToken(t.getUser()))
                 .orElseThrow(() -> new InvalidRefreshTokenException("Invalid refresh token"));
+    }
+
+    public JwtAuthenticationResponse refreshToken(String refreshToken) {
+        if (!isRefreshTokenValid(refreshToken)) {
+            throw new RuntimeException("Invalid refresh token");
+        }
+
+        UserDetails userDetails = getUserDetailsFromRefreshToken(refreshToken);
+        String jwt = generateTokenFromRefreshToken(refreshToken);
+        deleteRefreshToken((User) userDetails);
+        String newRefreshToken = generateRefreshToken(userDetails);
+
+        return new JwtAuthenticationResponse("Success", userDetails.getUsername(), jwt, newRefreshToken);
     }
 
     public void deleteRefreshToken(User user) {
