@@ -1,6 +1,6 @@
 package com.tech.task.auth;
 
-import com.tech.task.service.UserService;
+import com.tech.task.service.impl.UserServiceImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -27,10 +27,10 @@ import static org.springframework.security.config.http.SessionCreationPolicy.STA
 public class SecurityConfiguration {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
-    private final UserService userService;
+    private final UserServiceImpl userService;
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
 
-    public SecurityConfiguration(JwtAuthenticationFilter jwtAuthenticationFilter, UserService userService, CustomAuthenticationEntryPoint customAuthenticationEntryPoint) {
+    public SecurityConfiguration(JwtAuthenticationFilter jwtAuthenticationFilter, UserServiceImpl userService, CustomAuthenticationEntryPoint customAuthenticationEntryPoint) {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
         this.userService = userService;
         this.customAuthenticationEntryPoint = customAuthenticationEntryPoint;

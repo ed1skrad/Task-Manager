@@ -1,14 +1,13 @@
 package com.tech.task.auth;
 
-import com.tech.task.service.JwtService;
-import com.tech.task.service.UserService;
+import com.tech.task.service.impl.JwtServiceImpl;
+import com.tech.task.service.impl.UserServiceImpl;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -24,13 +23,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     public static final String BEARER_PREFIX = "Bearer ";
     public static final String HEADER_NAME = "Authorization";
-    private final JwtService jwtService;
-    private final UserService userService;
+    private final JwtServiceImpl jwtService;
+    private final UserServiceImpl userService;
     private final InvalidTokenRepository invalidTokenRepository;
 
-    @Autowired
-    public JwtAuthenticationFilter(JwtService jwtService, UserService userService,
-                                   InvalidTokenRepository invalidTokenRepository) {
+    public JwtAuthenticationFilter(JwtServiceImpl jwtService, UserServiceImpl userService, InvalidTokenRepository invalidTokenRepository) {
         this.jwtService = jwtService;
         this.userService = userService;
         this.invalidTokenRepository = invalidTokenRepository;
