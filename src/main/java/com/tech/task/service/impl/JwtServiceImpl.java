@@ -34,7 +34,7 @@ public class JwtServiceImpl implements JwtService {
             claims.put("email", customUserDetails.getEmail());
             claims.put("role", customUserDetails.getRoles());
         }
-        long expirationTime = 60 * 60 * 24 * 1000;
+        long expirationTime = 60 * 60 * 24 * (long)1000;
         return Jwts.builder().setClaims(claims).setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + expirationTime))

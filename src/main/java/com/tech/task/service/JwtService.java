@@ -1,9 +1,6 @@
 package com.tech.task.service;
 
-import io.jsonwebtoken.Claims;
 import org.springframework.security.core.userdetails.UserDetails;
-
-import java.util.function.Function;
 
 public interface JwtService {
 

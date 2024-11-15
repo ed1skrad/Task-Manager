@@ -7,11 +7,12 @@ import com.tech.task.repository.RefreshTokenRepository;
 import com.tech.task.service.RefreshTokenService;
 import com.tech.task.utils.TokenGenerator;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.time.Instant;
 import java.util.Optional;
 
+@Service
 @Transactional
 public class RefreshTokenServiceImpl implements RefreshTokenService {
 
@@ -28,15 +29,13 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     public String generateRefreshToken(UserDetails userDetails) {
         User user = (User) userDetails;
         if (refreshTokenRepository.existsByUser(user)) {
-            System.out.println(refreshTokenRepository.existsByUser(user));
             deleteRefreshToken(user);
         }
-        System.out.println(refreshTokenRepository.existsByUser(user));
         String token = tokenGenerator.generateToken();
         RefreshToken refreshToken = new RefreshToken();
         refreshToken.setUser(user);
         refreshToken.setToken(token);
-        refreshToken.setExpiryDate(Instant.now().plusMillis(60 * 60 * 24 * 7 * 1000));
+        refreshToken.setExpiryDate(Instant.now().plusMillis(60 * 60 * 24 * 7 * (long)1000));
         refreshTokenRepository.save(refreshToken);
         return token;
     }
