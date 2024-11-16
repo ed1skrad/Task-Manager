@@ -1,5 +1,7 @@
-package com.tech.task.auth;
+package com.tech.task.config;
 
+import com.tech.task.auth.CustomAuthenticationEntryPoint;
+import com.tech.task.auth.JwtAuthenticationFilter;
 import com.tech.task.service.impl.UserServiceImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
