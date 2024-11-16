@@ -1,19 +1,19 @@
-package com.tech.task.dto;
+package com.tech.task.dto.response;
 
 import com.tech.task.model.state.Priority;
 import com.tech.task.model.state.Status;
 
 import java.util.List;
 
-public class TaskDTO {
+public class TaskResponse {
     private Long id;
     private String title;
     private String description;
     private Status status;
     private Priority priority;
     private String comment;
-    private UserDTO creator;
-    private List<UserDTO> executors;
+    private UserResponse creator;
+    private List<UserResponse> executors;
 
     public Long getId() {
         return id;
@@ -63,19 +63,19 @@ public class TaskDTO {
         this.comment = comment;
     }
 
-    public UserDTO getCreator() {
+    public UserResponse getCreator() {
         return creator;
     }
 
-    public void setCreator(UserDTO creator) {
+    public void setCreator(UserResponse creator) {
         this.creator = creator;
     }
 
-    public List<UserDTO> getExecutors() {
+    public List<UserResponse> getExecutors() {
         return executors;
     }
 
-    public void setExecutors(List<UserDTO> executors) {
+    public void setExecutors(List<UserResponse> executors) {
         this.executors = executors;
     }
 }

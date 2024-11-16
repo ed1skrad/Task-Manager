@@ -1,7 +1,7 @@
 package com.tech.task.service.impl;
 
-import com.tech.task.dto.TaskDTO;
-import com.tech.task.dto.request.CreateTaskRequest;
+import com.tech.task.dto.request.CreateOrUpdateTaskRequest;
+import com.tech.task.dto.response.TaskResponse;
 import com.tech.task.model.Task;
 import com.tech.task.model.User;
 import com.tech.task.repository.TaskRepository;
@@ -10,7 +10,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class TaskServiceImpl implements TaskService {
@@ -25,31 +25,48 @@ public class TaskServiceImpl implements TaskService {
         this.modelMapper = modelMapper;
     }
 
-    public List<TaskDTO> getAllTask(){
+    public List<TaskResponse> getAllTask(){
         List<Task> tasks = taskRepository.findAll();
         return tasks.stream()
-                .map(task -> modelMapper.map(task, TaskDTO.class))
+                .map(task -> modelMapper.map(task, TaskResponse.class))
                 .toList();
     }
 
+    public void createTask(CreateOrUpdateTaskRequest createTaskRequest, String username){
 
-    public void createTask(CreateTaskRequest createTaskRequest, String username){
+        User creator = userService.getByUsername(username);
+        List<User> executors = createTaskRequest.getExecutorsIds() != null ?
+                createTaskRequest.getExecutorsIds().stream()
+                        .map(userService::getById)
+                        .collect(Collectors.toList()) : List.of();
 
-        User user = userService.getByUsername(username);
-
-        List<User> executors = createTaskRequest.getExecutorsIds().stream()
-                .map(userService::getById)
-                .toList();
-
-        Task task = new Task();
-        task.setTitle(createTaskRequest.getTitle());
-        task.setDescription(createTaskRequest.getDescription());
-        task.setPriority(createTaskRequest.getPriority());
-        task.setStatus(createTaskRequest.getStatus());
-        task.setComment(createTaskRequest.getComment());
-        task.setCreator(user);
+        Task task = modelMapper.map(createTaskRequest, Task.class);
+        task.setCreator(creator);
         task.setExecutors(executors);
-        taskRepository.save(task);
+
+        task = taskRepository.save(task);
+        modelMapper.map(task, CreateOrUpdateTaskRequest.class);
+    }
+
+    public TaskResponse updateTask(Long taskId, CreateOrUpdateTaskRequest updateTaskRequest) {
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new RuntimeException("Task not found!"));
+
+        task.setTitle(updateTaskRequest.getTitle());
+        task.setDescription(updateTaskRequest.getDescription());
+        task.setStatus(updateTaskRequest.getStatus());
+        task.setPriority(updateTaskRequest.getPriority());
+        task.setComment(updateTaskRequest.getComment());
+
+        List<User> executors = updateTaskRequest.getExecutorsIds() != null ?
+                updateTaskRequest.getExecutorsIds().stream()
+                        .map(userService::getById)
+                        .collect(Collectors.toList()) : List.of();
+        task.setExecutors(executors);
+
+        task = taskRepository.save(task);
+
+        return modelMapper.map(task, TaskResponse.class);
     }
 
     public void deleteTask(Long taskId){
@@ -57,23 +74,23 @@ public class TaskServiceImpl implements TaskService {
     }
 
 
-    public List<TaskDTO> getTaskByExecutorId(Long id){
+    public List<TaskResponse> getTaskByExecutorId(Long id){
         List<Task> tasks = taskRepository.getTaskByExecutorsId(id);
         return tasks.stream()
-                .map(task -> modelMapper.map(task, TaskDTO.class))
+                .map(task -> modelMapper.map(task, TaskResponse.class))
                 .toList();
     }
 
-    public TaskDTO getTaskByCreator(Long id) {
+    public TaskResponse getTaskByCreator(Long id) {
         Task task = taskRepository.getTaskByCreatorId(id)
                 .orElseThrow(() -> new RuntimeException("Task not found"));
 
-        return modelMapper.map(task, TaskDTO.class);
+        return modelMapper.map(task, TaskResponse.class);
     }
 
-    public TaskDTO getTaskById(Long id) {
+    public TaskResponse getTaskById(Long id) {
         Task task = taskRepository.findById(id)
                 .orElseThrow(() ->  new RuntimeException("Task not found!"));
-        return modelMapper.map(task, TaskDTO.class);
+        return modelMapper.map(task, TaskResponse.class);
     }
 }

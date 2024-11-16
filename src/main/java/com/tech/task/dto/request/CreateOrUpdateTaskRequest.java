@@ -1,23 +1,16 @@
 package com.tech.task.dto.request;
 
-import com.tech.task.model.User;
 import com.tech.task.model.state.Priority;
 import com.tech.task.model.state.Status;
 
 import java.util.List;
 
-public class CreateTaskRequest {
-
+public class CreateOrUpdateTaskRequest {
     private String title;
-
     private String description;
-
     private Status status;
-
     private Priority priority;
-
     private String comment;
-
     private List<Long> executorsIds;
 
     public String getTitle() {

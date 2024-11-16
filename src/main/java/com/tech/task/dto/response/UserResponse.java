@@ -1,6 +1,6 @@
-package com.tech.task.dto;
+package com.tech.task.dto.response;
 
-public class UserDTO {
+public class UserResponse {
     private Long id;
     private String username;
     private String email;
