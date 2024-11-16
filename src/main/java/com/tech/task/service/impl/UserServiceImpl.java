@@ -22,6 +22,11 @@ public class UserServiceImpl implements UserService {
 
     }
 
+    public User getById(Long id){
+        return userRepository.findById(id)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found!"));
+    }
+
     public UserDetailsService userDetailsService() {
         return this::getByUsername;
     }
