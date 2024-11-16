@@ -11,9 +11,9 @@ public class TaskResponse {
     private String description;
     private Status status;
     private Priority priority;
-    private String comment;
     private UserResponse creator;
     private List<UserResponse> executors;
+    private List<CommentResponse> comments;
 
     public Long getId() {
         return id;
@@ -55,14 +55,6 @@ public class TaskResponse {
         this.priority = priority;
     }
 
-    public String getComment() {
-        return comment;
-    }
-
-    public void setComment(String comment) {
-        this.comment = comment;
-    }
-
     public UserResponse getCreator() {
         return creator;
     }
@@ -77,5 +69,13 @@ public class TaskResponse {
 
     public void setExecutors(List<UserResponse> executors) {
         this.executors = executors;
+    }
+
+    public List<CommentResponse> getComments() {
+        return comments;
+    }
+
+    public void setComments(List<CommentResponse> comments) {
+        this.comments = comments;
     }
 }

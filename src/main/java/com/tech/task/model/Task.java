@@ -6,7 +6,6 @@ import jakarta.persistence.*;
 
 import java.util.List;
 
-
 @Entity
 @Table(name = "task")
 public class Task {
@@ -23,8 +22,6 @@ public class Task {
 
     private Priority priority;
 
-    private String comment;
-
     @ManyToOne
     @JoinColumn(name = "creator_id")
     private User creator;
@@ -37,6 +34,8 @@ public class Task {
     )
     private List<User> executors;
 
+    @OneToMany(mappedBy = "task", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Comment> comments;
 
     public Long getId() {
         return id;
@@ -78,14 +77,6 @@ public class Task {
         this.priority = priority;
     }
 
-    public String getComment() {
-        return comment;
-    }
-
-    public void setComment(String comment) {
-        this.comment = comment;
-    }
-
     public User getCreator() {
         return creator;
     }
@@ -100,5 +91,13 @@ public class Task {
 
     public void setExecutors(List<User> executors) {
         this.executors = executors;
+    }
+
+    public List<Comment> getComments() {
+        return comments;
+    }
+
+    public void setComments(List<Comment> comments) {
+        this.comments = comments;
     }
 }

@@ -1,5 +1,6 @@
 package com.tech.task.controller;
 
+import com.tech.task.dto.request.CommentRequest;
 import com.tech.task.dto.request.CreateOrUpdateTaskRequest;
 import com.tech.task.dto.response.TaskResponse;
 import com.tech.task.service.impl.TaskServiceImpl;
@@ -27,8 +28,8 @@ public class TaskController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CreateOrUpdateTaskRequest> updateTask(@PathVariable Long id, @RequestBody CreateOrUpdateTaskRequest updateTaskRequest) {
-        taskService.updateTask(id, updateTaskRequest);
+    public ResponseEntity<Object> updateTask(@RequestBody CreateOrUpdateTaskRequest createTaskRequest, @PathVariable Long id) {
+        taskService.updateTask(id, createTaskRequest);
         return ResponseEntity.ok().build();
     }
 
@@ -56,5 +57,12 @@ public class TaskController {
     @GetMapping("/all")
     public List<TaskResponse> getAllTasks(){
         return taskService.getAllTask();
+    }
+
+    @PostMapping("/{taskId}/comment")
+    public ResponseEntity<Object> addCommentToTask(@PathVariable Long taskId, @RequestBody CommentRequest commentRequest) {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        taskService.addCommentToTask(taskId, commentRequest, username);
+        return ResponseEntity.ok().build();
     }
 }

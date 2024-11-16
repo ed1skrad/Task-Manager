@@ -1,7 +1,9 @@
 package com.tech.task.service.impl;
 
 import com.tech.task.dto.request.CreateOrUpdateTaskRequest;
+import com.tech.task.dto.request.CommentRequest;
 import com.tech.task.dto.response.TaskResponse;
+import com.tech.task.model.Comment;
 import com.tech.task.model.Task;
 import com.tech.task.model.User;
 import com.tech.task.repository.TaskRepository;
@@ -33,7 +35,6 @@ public class TaskServiceImpl implements TaskService {
     }
 
     public void createTask(CreateOrUpdateTaskRequest createTaskRequest, String username){
-
         User creator = userService.getByUsername(username);
         List<User> executors = createTaskRequest.getExecutorsIds() != null ?
                 createTaskRequest.getExecutorsIds().stream()
@@ -56,7 +57,6 @@ public class TaskServiceImpl implements TaskService {
         task.setDescription(updateTaskRequest.getDescription());
         task.setStatus(updateTaskRequest.getStatus());
         task.setPriority(updateTaskRequest.getPriority());
-        task.setComment(updateTaskRequest.getComment());
 
         List<User> executors = updateTaskRequest.getExecutorsIds() != null ?
                 updateTaskRequest.getExecutorsIds().stream()
@@ -72,7 +72,6 @@ public class TaskServiceImpl implements TaskService {
     public void deleteTask(Long taskId){
         taskRepository.deleteById(taskId);
     }
-
 
     public List<TaskResponse> getTaskByExecutorId(Long id){
         List<Task> tasks = taskRepository.getTaskByExecutorsId(id);
@@ -92,5 +91,20 @@ public class TaskServiceImpl implements TaskService {
         Task task = taskRepository.findById(id)
                 .orElseThrow(() ->  new RuntimeException("Task not found!"));
         return modelMapper.map(task, TaskResponse.class);
+    }
+
+    public void addCommentToTask(Long taskId, CommentRequest commentRequest, String username) {
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new RuntimeException("Task not found!"));
+
+        User user = userService.getByUsername(username);
+
+        Comment comment = new Comment();
+        comment.setText(commentRequest.getText());
+        comment.setUser(user);
+        comment.setTask(task);
+
+        task.getComments().add(comment);
+        taskRepository.save(task);
     }
 }

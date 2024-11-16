@@ -10,8 +10,8 @@ public class CreateOrUpdateTaskRequest {
     private String description;
     private Status status;
     private Priority priority;
-    private String comment;
     private List<Long> executorsIds;
+    private List<CommentRequest> comments;
 
     public String getTitle() {
         return title;
@@ -45,19 +45,19 @@ public class CreateOrUpdateTaskRequest {
         this.priority = priority;
     }
 
-    public String getComment() {
-        return comment;
-    }
-
-    public void setComment(String comment) {
-        this.comment = comment;
-    }
-
     public List<Long> getExecutorsIds() {
         return executorsIds;
     }
 
     public void setExecutorsIds(List<Long> executorsIds) {
         this.executorsIds = executorsIds;
+    }
+
+    public List<CommentRequest> getComments() {
+        return comments;
+    }
+
+    public void setComments(List<CommentRequest> comments) {
+        this.comments = comments;
     }
 }
