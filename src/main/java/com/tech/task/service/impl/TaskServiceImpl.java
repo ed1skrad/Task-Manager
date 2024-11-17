@@ -2,13 +2,15 @@ package com.tech.task.service.impl;
 
 import com.tech.task.dto.request.CreateOrUpdateTaskRequest;
 import com.tech.task.dto.request.CommentRequest;
+import com.tech.task.dto.request.UpdateTaskPriorityRequest;
 import com.tech.task.dto.request.UpdateTaskStatusRequest;
 import com.tech.task.dto.response.TaskResponse;
+import com.tech.task.exception.ForbiddenException;
+import com.tech.task.exception.TaskNotFoundException;
 import com.tech.task.model.Comment;
 import com.tech.task.model.Task;
 import com.tech.task.model.User;
 import com.tech.task.model.role.RoleEnum;
-import com.tech.task.model.state.Priority;
 import com.tech.task.repository.TaskRepository;
 import com.tech.task.service.TaskService;
 import org.modelmapper.ModelMapper;
@@ -25,7 +27,8 @@ public class TaskServiceImpl implements TaskService {
     private final TaskRepository taskRepository;
     private final UserServiceImpl userService;
     private final ModelMapper modelMapper;
-
+    private static final String TASK_NOT_FOUND_MESSAGE = "Task not found!";
+    
     public TaskServiceImpl(TaskRepository taskRepository, UserServiceImpl userService, ModelMapper modelMapper) {
         this.taskRepository = taskRepository;
         this.userService = userService;
@@ -56,7 +59,7 @@ public class TaskServiceImpl implements TaskService {
 
     public void updateTask(Long taskId, CreateOrUpdateTaskRequest updateTaskRequest) {
         Task task = taskRepository.findById(taskId)
-                .orElseThrow(() -> new RuntimeException("Task not found!"));
+                .orElseThrow(() -> new TaskNotFoundException(TASK_NOT_FOUND_MESSAGE));
 
         task.setTitle(updateTaskRequest.getTitle());
         task.setDescription(updateTaskRequest.getDescription());
@@ -90,13 +93,13 @@ public class TaskServiceImpl implements TaskService {
 
     public TaskResponse getTaskById(Long id) {
         Task task = taskRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Task not found!"));
+                .orElseThrow(() -> new TaskNotFoundException(TASK_NOT_FOUND_MESSAGE));
         return modelMapper.map(task, TaskResponse.class);
     }
 
     public void addCommentToTask(Long taskId, CommentRequest commentRequest, String username) {
         Task task = taskRepository.findById(taskId)
-                .orElseThrow(() -> new RuntimeException("Task not found!"));
+                .orElseThrow(() -> new TaskNotFoundException(TASK_NOT_FOUND_MESSAGE));
 
         User user = userService.getByUsername(username);
         if(isUserAllowedToChangeTask(user, task)) {
@@ -108,13 +111,13 @@ public class TaskServiceImpl implements TaskService {
             task.getComments().add(comment);
             taskRepository.save(task);
         } else {
-            throw new RuntimeException("You are not allowed to add comments to task!");
+            throw new ForbiddenException("You are not allowed to add comments to task!");
         }
     }
 
     public void deleteCommentById(Long taskId, List<Long> commentsId) {
         Task task = taskRepository.findById(taskId)
-                .orElseThrow(() -> new RuntimeException("Task not found!"));
+                .orElseThrow(() -> new TaskNotFoundException(TASK_NOT_FOUND_MESSAGE));
 
         List<Comment> commentsToRemove = task.getComments().stream()
                 .filter(comment -> commentsId.contains(comment.getId()))
@@ -126,7 +129,7 @@ public class TaskServiceImpl implements TaskService {
 
     public void deleteExecutorsByIds(Long taskId, List<Long> executorIds) {
         Task task = taskRepository.findById(taskId)
-                .orElseThrow(() -> new RuntimeException("Task not found!"));
+                .orElseThrow(() -> new TaskNotFoundException(TASK_NOT_FOUND_MESSAGE));
 
         List<User> executorsToRemove = executorIds.stream()
                 .map(userService::getById)
@@ -138,7 +141,7 @@ public class TaskServiceImpl implements TaskService {
 
     public void assignExecutors(Long taskId, List<Long> executorIds) {
         Task task = taskRepository.findById(taskId)
-                .orElseThrow(() -> new RuntimeException("Task not found!"));
+                .orElseThrow(() -> new TaskNotFoundException(TASK_NOT_FOUND_MESSAGE));
 
         List<User> executorsToAssign = executorIds.stream()
                 .map(userService::getById)
@@ -148,26 +151,25 @@ public class TaskServiceImpl implements TaskService {
         taskRepository.save(task);
     }
 
+    public void updateTaskPriority(Long taskId, UpdateTaskPriorityRequest updateTaskPriorityRequest) {
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new TaskNotFoundException(TASK_NOT_FOUND_MESSAGE));
+
+        task.setPriority(updateTaskPriorityRequest.getPriority());
+        taskRepository.save(task);
+    }
+
     public void updateTaskStatus(Long taskId, UpdateTaskStatusRequest updateTaskStatusRequest, String username) {
         User user = userService.getByUsername(username);
         Task task = taskRepository.findById(taskId)
-                .orElseThrow(() -> new RuntimeException("Task not found!"));
+                .orElseThrow(() -> new TaskNotFoundException(TASK_NOT_FOUND_MESSAGE));
 
         if (isUserAllowedToChangeTask(user, task)) {
             task.setStatus(updateTaskStatusRequest.getStatus());
             taskRepository.save(task);
         } else {
-            throw new RuntimeException("You are not allowed to change task status");
+            throw new ForbiddenException("You are not allowed to change task status");
         }
-    }
-
-
-    public void updateTaskPriority(Long taskId, Priority priority) {
-        Task task = taskRepository.findById(taskId)
-                .orElseThrow(() -> new RuntimeException("Task not found!"));
-
-        task.setPriority(priority);
-        taskRepository.save(task);
     }
 
     private boolean isUserAllowedToChangeTask(User user, Task task) {

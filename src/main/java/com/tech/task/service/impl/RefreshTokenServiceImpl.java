@@ -20,6 +20,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     private final RefreshTokenRepository refreshTokenRepository;
     private final TokenGenerator tokenGenerator;
     private final JwtServiceImpl jwtService;
+    private static final String INVALID_REFRESH_TOKEN = "Invalid refresh token!";
 
     public RefreshTokenServiceImpl(RefreshTokenRepository refreshTokenRepository, TokenGenerator tokenGenerator, JwtServiceImpl jwtService) {
         this.refreshTokenRepository = refreshTokenRepository;
@@ -53,18 +54,18 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     public UserDetails getUserDetailsFromRefreshToken(String refreshToken) {
         return refreshTokenRepository.findByToken(refreshToken)
                 .map(RefreshToken::getUser)
-                .orElseThrow(() -> new InvalidRefreshTokenException("Invalid refresh token"));
+                .orElseThrow(() -> new InvalidRefreshTokenException(INVALID_REFRESH_TOKEN));
     }
 
     public String generateTokenFromRefreshToken(String refreshToken) {
         return refreshTokenRepository.findByToken(refreshToken)
                 .map(t -> jwtService.generateToken(t.getUser()))
-                .orElseThrow(() -> new InvalidRefreshTokenException("Invalid refresh token"));
+                .orElseThrow(() -> new InvalidRefreshTokenException(INVALID_REFRESH_TOKEN));
     }
 
     public JwtAuthenticationResponse refreshToken(String refreshToken) {
         if (!isRefreshTokenValid(refreshToken)) {
-            throw new RuntimeException("Invalid refresh token");
+            throw new InvalidRefreshTokenException(INVALID_REFRESH_TOKEN);
         }
 
         UserDetails userDetails = getUserDetailsFromRefreshToken(refreshToken);

@@ -2,6 +2,7 @@ package com.tech.task.controller;
 
 import com.tech.task.dto.request.CommentRequest;
 import com.tech.task.dto.request.CreateOrUpdateTaskRequest;
+import com.tech.task.dto.request.UpdateTaskPriorityRequest;
 import com.tech.task.dto.response.TaskResponse;
 import com.tech.task.dto.request.UpdateTaskStatusRequest;
 import com.tech.task.service.impl.TaskServiceImpl;
@@ -22,25 +23,6 @@ public class TaskController {
 
     public TaskController(TaskServiceImpl taskService) {
         this.taskService = taskService;
-    }
-
-    @PostMapping()
-    public ResponseEntity<Object> createTask(@RequestBody CreateOrUpdateTaskRequest createTaskRequest) {
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        taskService.createTask(createTaskRequest, username);
-        return ResponseEntity.ok().build();
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<Object> updateTask(@RequestBody CreateOrUpdateTaskRequest createTaskRequest, @PathVariable Long id) {
-        taskService.updateTask(id, createTaskRequest);
-        return ResponseEntity.ok().build();
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Object> deleteTaskById(@PathVariable Long id) {
-        taskService.deleteTask(id);
-        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/executor/{id}")
@@ -69,10 +51,39 @@ public class TaskController {
         return taskService.getAllTask();
     }
 
+    @PostMapping()
+    public ResponseEntity<Object> createTask(@RequestBody CreateOrUpdateTaskRequest createTaskRequest) {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        taskService.createTask(createTaskRequest, username);
+        return ResponseEntity.ok().build();
+    }
+
     @PostMapping("/{taskId}/comment")
     public ResponseEntity<Object> addCommentToTask(@PathVariable Long taskId, @RequestBody CommentRequest commentRequest) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         taskService.addCommentToTask(taskId, commentRequest, username);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{taskId}/executors")
+    public ResponseEntity<Void> assignExecutors(
+            @PathVariable Long taskId,
+            @RequestBody List<Long> executorIds) {
+        taskService.assignExecutors(taskId, executorIds);
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Object> updateTask(@RequestBody CreateOrUpdateTaskRequest createTaskRequest, @PathVariable Long id) {
+        taskService.updateTask(id, createTaskRequest);
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/{taskId}/priority")
+    public ResponseEntity<Void> updateTaskPriority(
+            @PathVariable Long taskId,
+            @RequestBody UpdateTaskPriorityRequest updateTaskPriorityRequest) {
+        taskService.updateTaskPriority(taskId, updateTaskPriorityRequest);
         return ResponseEntity.ok().build();
     }
 
@@ -81,6 +92,28 @@ public class TaskController {
     public ResponseEntity<Object> changeTaskStatus(@PathVariable Long taskId, @RequestBody UpdateTaskStatusRequest updateTaskStatusRequest){
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         taskService.updateTaskStatus(taskId, updateTaskStatusRequest, username);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Object> deleteTaskById(@PathVariable Long id) {
+        taskService.deleteTask(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/{taskId}/comments")
+    public ResponseEntity<Void> deleteCommentById(
+            @PathVariable Long taskId,
+            @RequestBody List<Long> commentsId) {
+        taskService.deleteCommentById(taskId, commentsId);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/{taskId}/executors")
+    public ResponseEntity<Void> deleteExecutorsByIds(
+            @PathVariable Long taskId,
+            @RequestBody List<Long> executorIds) {
+        taskService.deleteExecutorsByIds(taskId, executorIds);
         return ResponseEntity.ok().build();
     }
 }
