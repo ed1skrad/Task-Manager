@@ -3,8 +3,10 @@ package com.tech.task.controller;
 import com.tech.task.dto.request.CommentRequest;
 import com.tech.task.dto.request.CreateOrUpdateTaskRequest;
 import com.tech.task.dto.response.TaskResponse;
+import com.tech.task.dto.request.UpdateTaskStatusRequest;
 import com.tech.task.service.impl.TaskServiceImpl;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
@@ -63,6 +65,14 @@ public class TaskController {
     public ResponseEntity<Object> addCommentToTask(@PathVariable Long taskId, @RequestBody CommentRequest commentRequest) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         taskService.addCommentToTask(taskId, commentRequest, username);
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/{taskId}/status")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    public ResponseEntity<Object> changeTaskStatus(@PathVariable Long taskId, @RequestBody UpdateTaskStatusRequest updateTaskStatusRequest){
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        taskService.updateTaskStatus(taskId, updateTaskStatusRequest, username);
         return ResponseEntity.ok().build();
     }
 }
