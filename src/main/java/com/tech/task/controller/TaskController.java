@@ -6,6 +6,13 @@ import com.tech.task.dto.request.UpdateTaskPriorityRequest;
 import com.tech.task.dto.response.TaskResponse;
 import com.tech.task.dto.request.UpdateTaskStatusRequest;
 import com.tech.task.service.impl.TaskServiceImpl;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +24,8 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/task")
+@Tag(name = "Task Management", description = "Endpoints for managing tasks")
+@SecurityRequirement(name = "bearerAuth")
 public class TaskController {
 
     private final TaskServiceImpl taskService;
@@ -25,6 +34,14 @@ public class TaskController {
         this.taskService = taskService;
     }
 
+    @Operation(summary = "Get tasks by executor ID", description = "Retrieve tasks assigned to a specific executor")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successful operation",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = Page.class))),
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
+            @ApiResponse(responseCode = "404", description = "Not Found")
+    })
     @GetMapping("/executor/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Page<TaskResponse>> getTaskByExecutorId(
@@ -34,6 +51,14 @@ public class TaskController {
         return ResponseEntity.ok(tasks);
     }
 
+    @Operation(summary = "Get tasks by creator ID", description = "Retrieve tasks created by a specific user")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successful operation",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = Page.class))),
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
+            @ApiResponse(responseCode = "404", description = "Not Found")
+    })
     @GetMapping("/creator/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Page<TaskResponse>> getTaskByCreator(
@@ -43,18 +68,38 @@ public class TaskController {
         return ResponseEntity.ok(tasks);
     }
 
+    @Operation(summary = "Get task by ID", description = "Retrieve a specific task by its ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successful operation",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = TaskResponse.class))),
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
+            @ApiResponse(responseCode = "404", description = "Not Found")
+    })
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public TaskResponse getTaskById(@PathVariable Long id){
         return taskService.getTaskById(id);
     }
 
+    @Operation(summary = "Get all tasks", description = "Retrieve all tasks")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successful operation",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = List.class))),
+            @ApiResponse(responseCode = "403", description = "Forbidden")
+    })
     @GetMapping("/all")
     @PreAuthorize("hasRole('ADMIN')")
     public List<TaskResponse> getAllTasks(){
         return taskService.getAllTask();
     }
 
+    @Operation(summary = "Create a new task", description = "Create a new task")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successful operation"),
+            @ApiResponse(responseCode = "403", description = "Forbidden")
+    })
     @PostMapping()
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Object> createTask(@RequestBody CreateOrUpdateTaskRequest createTaskRequest) {
@@ -63,6 +108,11 @@ public class TaskController {
         return ResponseEntity.ok().build();
     }
 
+    @Operation(summary = "Add a comment to a task", description = "Add a comment to a specific task")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successful operation"),
+            @ApiResponse(responseCode = "403", description = "Forbidden")
+    })
     @PostMapping("/{taskId}/comment")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<Object> addCommentToTask(@PathVariable Long taskId, @RequestBody CommentRequest commentRequest) {
@@ -71,6 +121,11 @@ public class TaskController {
         return ResponseEntity.ok().build();
     }
 
+    @Operation(summary = "Assign executors to a task", description = "Assign executors to a specific task")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successful operation"),
+            @ApiResponse(responseCode = "403", description = "Forbidden")
+    })
     @PostMapping("/{taskId}/executors")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> assignExecutors(
@@ -80,6 +135,11 @@ public class TaskController {
         return ResponseEntity.ok().build();
     }
 
+    @Operation(summary = "Update a task", description = "Update a specific task")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successful operation"),
+            @ApiResponse(responseCode = "403", description = "Forbidden")
+    })
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Object> updateTask(@RequestBody CreateOrUpdateTaskRequest createTaskRequest, @PathVariable Long id) {
@@ -87,6 +147,11 @@ public class TaskController {
         return ResponseEntity.ok().build();
     }
 
+    @Operation(summary = "Update task priority", description = "Update the priority of a specific task")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successful operation"),
+            @ApiResponse(responseCode = "403", description = "Forbidden")
+    })
     @PutMapping("/{taskId}/priority")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> updateTaskPriority(
@@ -96,6 +161,11 @@ public class TaskController {
         return ResponseEntity.ok().build();
     }
 
+    @Operation(summary = "Change task status", description = "Change the status of a specific task")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successful operation"),
+            @ApiResponse(responseCode = "403", description = "Forbidden")
+    })
     @PutMapping("/{taskId}/status")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<Object> changeTaskStatus(@PathVariable Long taskId, @RequestBody UpdateTaskStatusRequest updateTaskStatusRequest){
@@ -104,6 +174,11 @@ public class TaskController {
         return ResponseEntity.ok().build();
     }
 
+    @Operation(summary = "Delete a task by ID", description = "Delete a specific task by its ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "No Content"),
+            @ApiResponse(responseCode = "403", description = "Forbidden")
+    })
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Object> deleteTaskById(@PathVariable Long id) {
@@ -111,6 +186,11 @@ public class TaskController {
         return ResponseEntity.noContent().build();
     }
 
+    @Operation(summary = "Delete comments from a task", description = "Delete specific comments from a task")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successful operation"),
+            @ApiResponse(responseCode = "403", description = "Forbidden")
+    })
     @DeleteMapping("/{taskId}/comments")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteCommentById(
@@ -120,6 +200,11 @@ public class TaskController {
         return ResponseEntity.ok().build();
     }
 
+    @Operation(summary = "Delete executors from a task", description = "Delete specific executors from a task")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successful operation"),
+            @ApiResponse(responseCode = "403", description = "Forbidden")
+    })
     @DeleteMapping("/{taskId}/executors")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteExecutorsByIds(
