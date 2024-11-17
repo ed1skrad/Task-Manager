@@ -8,8 +8,6 @@ public class SignUpRequest {
 
     private String password;
 
-    private String displayName;
-
     public String getUsername() {
         return username;
     }
@@ -32,13 +30,5 @@ public class SignUpRequest {
 
     public void setPassword(String password) {
         this.password = password;
-    }
-
-    public String getDisplayName() {
-        return displayName;
-    }
-
-    public void setDisplayName(String displayName) {
-        this.displayName = displayName;
     }
 }
