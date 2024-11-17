@@ -5,6 +5,8 @@ import com.tech.task.dto.request.CreateOrUpdateTaskRequest;
 import com.tech.task.dto.response.TaskResponse;
 import com.tech.task.dto.request.UpdateTaskStatusRequest;
 import com.tech.task.service.impl.TaskServiceImpl;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -41,14 +43,20 @@ public class TaskController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/creator/{id}")
-    public TaskResponse getTaskByCreatorId(@PathVariable Long id){
-        return taskService.getTaskByCreator(id);
+    @GetMapping("/executor/{id}")
+    public ResponseEntity<Page<TaskResponse>> getTaskByExecutorId(
+            @PathVariable Long id,
+            Pageable pageable) {
+        Page<TaskResponse> tasks = taskService.getTaskByExecutorId(id, pageable);
+        return ResponseEntity.ok(tasks);
     }
 
-    @GetMapping("/executor/{id}")
-    public List<TaskResponse> getTaskByExecutorId(@PathVariable Long id){
-        return taskService.getTaskByExecutorId(id);
+    @GetMapping("/creator/{id}")
+    public ResponseEntity<Page<TaskResponse>> getTaskByCreator(
+            @PathVariable Long id,
+            Pageable pageable) {
+        Page<TaskResponse> tasks = taskService.getTaskByCreator(id, pageable);
+        return ResponseEntity.ok(tasks);
     }
 
     @GetMapping("/{id}")

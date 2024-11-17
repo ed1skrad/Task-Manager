@@ -9,10 +9,11 @@ import com.tech.task.model.Task;
 import com.tech.task.model.User;
 import com.tech.task.model.role.RoleEnum;
 import com.tech.task.model.state.Priority;
-import com.tech.task.model.state.Status;
 import com.tech.task.repository.TaskRepository;
 import com.tech.task.service.TaskService;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -77,18 +78,14 @@ public class TaskServiceImpl implements TaskService {
         taskRepository.deleteById(taskId);
     }
 
-    public List<TaskResponse> getTaskByExecutorId(Long id) {
-        List<Task> tasks = taskRepository.getTaskByExecutorsId(id);
-        return tasks.stream()
-                .map(task -> modelMapper.map(task, TaskResponse.class))
-                .toList();
+    public Page<TaskResponse> getTaskByExecutorId(Long id, Pageable pageable) {
+        Page<Task> tasks = taskRepository.getTaskByExecutorsId(id, pageable);
+        return tasks.map(task -> modelMapper.map(task, TaskResponse.class));
     }
 
-    public TaskResponse getTaskByCreator(Long id) {
-        Task task = taskRepository.getTaskByCreatorId(id)
-                .orElseThrow(() -> new RuntimeException("Task not found"));
-
-        return modelMapper.map(task, TaskResponse.class);
+    public Page<TaskResponse> getTaskByCreator(Long id, Pageable pageable) {
+        Page<Task> tasks = taskRepository.getTaskByCreatorId(id, pageable);
+        return tasks.map(task -> modelMapper.map(task, TaskResponse.class));
     }
 
     public TaskResponse getTaskById(Long id) {
