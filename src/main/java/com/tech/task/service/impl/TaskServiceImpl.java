@@ -19,7 +19,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class TaskServiceImpl implements TaskService {
@@ -47,7 +46,7 @@ public class TaskServiceImpl implements TaskService {
         List<User> executors = createTaskRequest.getExecutorsIds() != null ?
                 createTaskRequest.getExecutorsIds().stream()
                         .map(userService::getById)
-                        .collect(Collectors.toList()) : List.of();
+                        .toList() : List.of();
 
         Task task = modelMapper.map(createTaskRequest, Task.class);
         task.setCreator(creator);
@@ -69,7 +68,7 @@ public class TaskServiceImpl implements TaskService {
         List<User> executors = updateTaskRequest.getExecutorsIds() != null ?
                 updateTaskRequest.getExecutorsIds().stream()
                         .map(userService::getById)
-                        .collect(Collectors.toList()) : List.of();
+                        .toList() : List.of();
         task.setExecutors(executors);
 
         task = taskRepository.save(task);
