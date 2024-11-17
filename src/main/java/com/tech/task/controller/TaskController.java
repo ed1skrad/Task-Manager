@@ -26,6 +26,7 @@ public class TaskController {
     }
 
     @GetMapping("/executor/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Page<TaskResponse>> getTaskByExecutorId(
             @PathVariable Long id,
             Pageable pageable) {
@@ -34,6 +35,7 @@ public class TaskController {
     }
 
     @GetMapping("/creator/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Page<TaskResponse>> getTaskByCreator(
             @PathVariable Long id,
             Pageable pageable) {
@@ -42,16 +44,19 @@ public class TaskController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public TaskResponse getTaskById(@PathVariable Long id){
         return taskService.getTaskById(id);
     }
 
     @GetMapping("/all")
+    @PreAuthorize("hasRole('ADMIN')")
     public List<TaskResponse> getAllTasks(){
         return taskService.getAllTask();
     }
 
     @PostMapping()
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Object> createTask(@RequestBody CreateOrUpdateTaskRequest createTaskRequest) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         taskService.createTask(createTaskRequest, username);
@@ -59,6 +64,7 @@ public class TaskController {
     }
 
     @PostMapping("/{taskId}/comment")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<Object> addCommentToTask(@PathVariable Long taskId, @RequestBody CommentRequest commentRequest) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         taskService.addCommentToTask(taskId, commentRequest, username);
@@ -66,6 +72,7 @@ public class TaskController {
     }
 
     @PostMapping("/{taskId}/executors")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> assignExecutors(
             @PathVariable Long taskId,
             @RequestBody List<Long> executorIds) {
@@ -74,12 +81,14 @@ public class TaskController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Object> updateTask(@RequestBody CreateOrUpdateTaskRequest createTaskRequest, @PathVariable Long id) {
         taskService.updateTask(id, createTaskRequest);
         return ResponseEntity.ok().build();
     }
 
     @PutMapping("/{taskId}/priority")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> updateTaskPriority(
             @PathVariable Long taskId,
             @RequestBody UpdateTaskPriorityRequest updateTaskPriorityRequest) {
@@ -96,12 +105,14 @@ public class TaskController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Object> deleteTaskById(@PathVariable Long id) {
         taskService.deleteTask(id);
         return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/{taskId}/comments")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteCommentById(
             @PathVariable Long taskId,
             @RequestBody List<Long> commentsId) {
@@ -110,6 +121,7 @@ public class TaskController {
     }
 
     @DeleteMapping("/{taskId}/executors")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteExecutorsByIds(
             @PathVariable Long taskId,
             @RequestBody List<Long> executorIds) {
