@@ -19,7 +19,7 @@ import java.util.Date;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
-public class JwtServiceImplTest {
+class JwtServiceImplTest {
 
     @InjectMocks
     private JwtServiceImpl jwtService;

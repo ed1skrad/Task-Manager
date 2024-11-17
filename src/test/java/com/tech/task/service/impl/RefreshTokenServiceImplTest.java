@@ -1,10 +1,13 @@
 package com.tech.task.service.impl;
 
+import com.tech.task.dto.request.CreateOrUpdateTaskRequest;
 import com.tech.task.dto.response.JwtAuthenticationResponse;
 import com.tech.task.exception.InvalidRefreshTokenException;
+import com.tech.task.model.Task;
 import com.tech.task.model.User;
 import com.tech.task.model.token.RefreshToken;
 import com.tech.task.repository.RefreshTokenRepository;
+import com.tech.task.repository.TaskRepository;
 import com.tech.task.utils.TokenGenerator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,16 +15,18 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.modelmapper.ModelMapper;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class RefreshTokenServiceImplTest {
+class RefreshTokenServiceImplTest {
 
     @Mock
     private RefreshTokenRepository refreshTokenRepository;
@@ -32,10 +37,23 @@ public class RefreshTokenServiceImplTest {
     @Mock
     private JwtServiceImpl jwtService;
 
+    @Mock
+    private TaskRepository taskRepository;
+
+    @Mock
+    private UserServiceImpl userService;
+
+    @Mock
+    private ModelMapper modelMapper;
+
+    @InjectMocks
+    private TaskServiceImpl taskService;
+
     @InjectMocks
     private RefreshTokenServiceImpl refreshTokenService;
 
     private User user;
+
     private RefreshToken refreshToken;
 
     @BeforeEach
@@ -126,5 +144,40 @@ public class RefreshTokenServiceImplTest {
         refreshTokenService.deleteRefreshToken(user);
 
         verify(refreshTokenRepository, times(1)).deleteByUser(user);
+    }
+
+    @Test
+    void createTask_Success() {
+        CreateOrUpdateTaskRequest createTaskRequest = new CreateOrUpdateTaskRequest();
+        createTaskRequest.setTitle("Test Task");
+        createTaskRequest.setDescription("Test Description");
+        createTaskRequest.setExecutorsIds(List.of(1L, 2L));
+
+        User creator = new User();
+        creator.setId(1L);
+        creator.setUsername("creator");
+
+        User executor1 = new User();
+        executor1.setId(1L);
+
+        User executor2 = new User();
+        executor2.setId(2L);
+
+        Task task = new Task();
+        task.setTitle("Test Task");
+        task.setDescription("Test Description");
+        task.setCreator(creator);
+        task.setExecutors(List.of(executor1, executor2));
+
+        when(userService.getByUsername("creator")).thenReturn(creator);
+        when(userService.getById(1L)).thenReturn(executor1);
+        when(userService.getById(2L)).thenReturn(executor2);
+        when(modelMapper.map(createTaskRequest, Task.class)).thenReturn(task);
+        when(taskRepository.save(any(Task.class))).thenReturn(task);
+
+        taskService.createTask(createTaskRequest, "creator");
+
+        verify(taskRepository, times(1)).save(any(Task.class));
+        verify(modelMapper, times(1)).map(any(Task.class), eq(CreateOrUpdateTaskRequest.class));
     }
 }

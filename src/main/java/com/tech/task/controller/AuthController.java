@@ -3,11 +3,7 @@ package com.tech.task.controller;
 import com.tech.task.dto.request.SignInRequest;
 import com.tech.task.dto.request.SignUpRequest;
 import com.tech.task.dto.response.JwtAuthenticationResponse;
-import com.tech.task.service.AuthenticationService;
 import com.tech.task.service.impl.AuthenticationServiceImpl;
-import com.tech.task.service.impl.JwtServiceImpl;
-import io.jsonwebtoken.Claims;
-import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
