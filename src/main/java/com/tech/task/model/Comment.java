@@ -1,6 +1,8 @@
 package com.tech.task.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 @Entity
 @Table(name = "comment")
@@ -10,6 +12,8 @@ public class Comment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "Comment text is mandatory")
+    @Size(min = 3, max = 255, message = "Comment text must be between 3 and 255 characters")
     private String text;
 
     @ManyToOne

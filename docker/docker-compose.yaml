@@ -13,7 +13,7 @@ services:
       - postgres_data:/var/lib/postgresql/data
 
   task_manager:
-    build: .
+    build: ..
     container_name: task_manager_app
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/task_manager

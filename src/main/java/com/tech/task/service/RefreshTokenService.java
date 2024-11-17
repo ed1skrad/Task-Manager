@@ -5,15 +5,13 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 public interface RefreshTokenService {
 
-    public String generateRefreshToken(UserDetails userDetails);
+    String generateRefreshToken(UserDetails userDetails);
 
-    public boolean isRefreshTokenValid(String token);
+    boolean isRefreshTokenValid(String token);
 
-    public UserDetails getUserDetailsFromRefreshToken(String refreshToken);
+    UserDetails getUserDetailsFromRefreshToken(String refreshToken);
 
-    public String generateTokenFromRefreshToken(String refreshToken);
+    String generateTokenFromRefreshToken(String refreshToken);
 
-    public void deleteRefreshToken(User user);
-
-    public void deleteRefreshTokenById(Long id);
+    void deleteRefreshToken(User user);
 }

@@ -1,6 +1,7 @@
 package com.tech.task.model.role;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 
 import java.io.Serializable;
 
@@ -11,6 +12,7 @@ public class Role implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    @NotNull(message = "Role name is mandatory")
     @Enumerated(EnumType.STRING)
     @Column(length = 20)
     private RoleEnum name;
@@ -38,4 +40,3 @@ public class Role implements Serializable {
         this.name = name;
     }
 }
-

@@ -79,8 +79,4 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     public void deleteRefreshToken(User user) {
         refreshTokenRepository.deleteByUser(user);
     }
-
-    public void deleteRefreshTokenById(Long id){
-        refreshTokenRepository.deleteById(id);
-    }
 }

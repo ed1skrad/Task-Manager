@@ -2,6 +2,8 @@ package com.tech.task.model.token;
 
 import com.tech.task.model.User;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
@@ -20,9 +22,11 @@ public class RefreshToken {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private User user;
 
+    @NotBlank(message = "Token is mandatory")
     @Column(nullable = false, unique = true)
     private String token;
 
+    @NotNull(message = "Expiry date is mandatory")
     @Column(nullable = false)
     private Instant expiryDate;
 
