@@ -30,7 +30,7 @@ public class User implements UserDetails {
     private String email;
 
     @NotBlank(message = "Password is mandatory")
-    @Size(min = 6, message = "Password must be at least 6 characters")
+    @Size(min = 5, message = "Password must be at least 6 characters")
     private String password;
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
