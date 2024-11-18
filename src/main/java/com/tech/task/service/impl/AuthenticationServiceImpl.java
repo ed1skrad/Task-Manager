@@ -58,10 +58,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         user.setUsername(request.getUsername());
         user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
-        Role roleInactive = roleRepository.findByName(RoleEnum.ROLE_USER)
-                .orElseThrow(() -> new RoleNotFoundException("Error. Role inactive not found."));
+        Role roleUser = roleRepository.findByName(RoleEnum.ROLE_USER)
+                .orElseThrow(() -> new RoleNotFoundException("Error. Role user not found."));
         List<Role> roles = new ArrayList<>();
-        roles.add(roleInactive);
+        roles.add(roleUser);
         user.setRoles(roles);
 
         userRepository.save(user);
@@ -85,5 +85,29 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         var jwt = jwtService.generateToken(user);
         var refreshToken = refreshTokenService.generateRefreshToken(user);
         return new JwtAuthenticationResponse("Success", request.getEmail(), jwt, refreshToken);
+    }
+
+    public JwtAuthenticationResponse createAdmin() {
+        if(userRepository.existsByUsername("admin")) {
+            throw new UsernameTakenException("Error: username is taken!");
+        }
+
+        User user = new User();
+        user.setUsername("admin");
+        user.setEmail("admin@gmail.com");
+        user.setPassword(passwordEncoder.encode("admin"));
+
+        Role roleAdmin = roleRepository.findByName(RoleEnum.ROLE_ADMIN)
+                .orElseThrow(() -> new RoleNotFoundException("Error. Role admin not found."));
+
+        List<Role> roles = new ArrayList<>();
+        roles.add(roleAdmin);
+        user.setRoles(roles);
+
+        userRepository.save(user);
+
+        var jwt = jwtService.generateToken(user);
+        var refreshToken = refreshTokenService.generateRefreshToken(user);
+        return new JwtAuthenticationResponse("Admin created successfully!", user.getUsername(), jwt, refreshToken);
     }
 }

@@ -11,7 +11,10 @@ import com.tech.task.model.Comment;
 import com.tech.task.model.Task;
 import com.tech.task.model.User;
 import com.tech.task.model.role.RoleEnum;
+import com.tech.task.model.state.Priority;
+import com.tech.task.model.state.Status;
 import com.tech.task.repository.TaskRepository;
+import com.tech.task.repository.specification.TaskSpecification;
 import com.tech.task.service.TaskService;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
@@ -27,18 +30,16 @@ public class TaskServiceImpl implements TaskService {
     private final UserServiceImpl userService;
     private final ModelMapper modelMapper;
     private static final String TASK_NOT_FOUND_MESSAGE = "Task not found!";
-    
+
     public TaskServiceImpl(TaskRepository taskRepository, UserServiceImpl userService, ModelMapper modelMapper) {
         this.taskRepository = taskRepository;
         this.userService = userService;
         this.modelMapper = modelMapper;
     }
 
-    public List<TaskResponse> getAllTask() {
-        List<Task> tasks = taskRepository.findAll();
-        return tasks.stream()
-                .map(task -> modelMapper.map(task, TaskResponse.class))
-                .toList();
+    public Page<TaskResponse> getAllTasks(Pageable pageable) {
+        Page<Task> tasks = taskRepository.findAll(pageable);
+        return tasks.map(task -> modelMapper.map(task, TaskResponse.class));
     }
 
     public void createTask(CreateOrUpdateTaskRequest createTaskRequest, String username) {
@@ -175,5 +176,9 @@ public class TaskServiceImpl implements TaskService {
         return user.getRoles().stream()
                 .anyMatch(role -> role.getName().equals(RoleEnum.ROLE_ADMIN)) ||
                 task.getExecutors().contains(user);
+    }
+
+    public Page<Task> getTasksByFilter(Status status, Priority priority, Long creatorId, Long executorId, Pageable pageable) {
+        return taskRepository.findAll(TaskSpecification.filterTasks(status, priority, creatorId, executorId), pageable);
     }
 }

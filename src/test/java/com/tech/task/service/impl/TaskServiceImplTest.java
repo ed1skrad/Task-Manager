@@ -22,6 +22,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 import java.util.ArrayList;
@@ -87,14 +88,18 @@ class TaskServiceImplTest {
     }
 
     @Test
-    void testGetAllTask() {
-        when(taskRepository.findAll()).thenReturn(Collections.singletonList(task));
+    void testGetAllTasks() {
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<Task> taskPage = new PageImpl<>(Collections.singletonList(task), pageable, 1);
+
+        when(taskRepository.findAll(pageable)).thenReturn(taskPage);
         when(modelMapper.map(any(Task.class), eq(TaskResponse.class))).thenReturn(new TaskResponse());
 
-        List<TaskResponse> result = taskService.getAllTask();
+        Page<TaskResponse> result = taskService.getAllTasks(pageable);
 
         assertNotNull(result);
-        assertEquals(1, result.size());
+        assertEquals(1, result.getTotalElements());
+        assertEquals(1, result.getContent().size());
     }
 
     @Test

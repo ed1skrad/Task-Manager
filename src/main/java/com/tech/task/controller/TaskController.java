@@ -5,6 +5,9 @@ import com.tech.task.dto.request.CreateOrUpdateTaskRequest;
 import com.tech.task.dto.request.UpdateTaskPriorityRequest;
 import com.tech.task.dto.response.TaskResponse;
 import com.tech.task.dto.request.UpdateTaskStatusRequest;
+import com.tech.task.model.Task;
+import com.tech.task.model.state.Priority;
+import com.tech.task.model.state.Status;
 import com.tech.task.service.impl.TaskServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -39,7 +42,7 @@ public class TaskController {
             @ApiResponse(responseCode = "200", description = "Successful operation",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = Page.class))),
-            @ApiResponse(responseCode = "403", description = "Forbidden"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
             @ApiResponse(responseCode = "404", description = "Not Found")
     })
     @GetMapping("/executor/{id}")
@@ -56,7 +59,7 @@ public class TaskController {
             @ApiResponse(responseCode = "200", description = "Successful operation",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = Page.class))),
-            @ApiResponse(responseCode = "403", description = "Forbidden"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
             @ApiResponse(responseCode = "404", description = "Not Found")
     })
     @GetMapping("/creator/{id}")
@@ -73,7 +76,7 @@ public class TaskController {
             @ApiResponse(responseCode = "200", description = "Successful operation",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = TaskResponse.class))),
-            @ApiResponse(responseCode = "403", description = "Forbidden"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
             @ApiResponse(responseCode = "404", description = "Not Found")
     })
     @GetMapping("/{id}")
@@ -86,19 +89,19 @@ public class TaskController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successful operation",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = List.class))),
-            @ApiResponse(responseCode = "403", description = "Forbidden")
+                            schema = @Schema(implementation = Page.class))),
+            @ApiResponse(responseCode = "401", description = "Unauthorized")
     })
     @GetMapping("/all")
     @PreAuthorize("hasRole('ADMIN')")
-    public List<TaskResponse> getAllTasks(){
-        return taskService.getAllTask();
+    public Page<TaskResponse> getAllTasks(Pageable pageable){
+        return taskService.getAllTasks(pageable);
     }
 
     @Operation(summary = "Create a new task", description = "Create a new task")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successful operation"),
-            @ApiResponse(responseCode = "403", description = "Forbidden")
+            @ApiResponse(responseCode = "401", description = "Unauthorized")
     })
     @PostMapping()
     @PreAuthorize("hasRole('ADMIN')")
@@ -111,7 +114,7 @@ public class TaskController {
     @Operation(summary = "Add a comment to a task", description = "Add a comment to a specific task")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successful operation"),
-            @ApiResponse(responseCode = "403", description = "Forbidden")
+            @ApiResponse(responseCode = "401", description = "Unauthorized")
     })
     @PostMapping("/{taskId}/comment")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
@@ -124,7 +127,7 @@ public class TaskController {
     @Operation(summary = "Assign executors to a task", description = "Assign executors to a specific task")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successful operation"),
-            @ApiResponse(responseCode = "403", description = "Forbidden")
+            @ApiResponse(responseCode = "401", description = "Unauthorized")
     })
     @PostMapping("/{taskId}/executors")
     @PreAuthorize("hasRole('ADMIN')")
@@ -138,7 +141,7 @@ public class TaskController {
     @Operation(summary = "Update a task", description = "Update a specific task")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successful operation"),
-            @ApiResponse(responseCode = "403", description = "Forbidden")
+            @ApiResponse(responseCode = "401", description = "Unauthorized")
     })
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
@@ -150,7 +153,7 @@ public class TaskController {
     @Operation(summary = "Update task priority", description = "Update the priority of a specific task")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successful operation"),
-            @ApiResponse(responseCode = "403", description = "Forbidden")
+            @ApiResponse(responseCode = "401", description = "Unauthorized")
     })
     @PutMapping("/{taskId}/priority")
     @PreAuthorize("hasRole('ADMIN')")
@@ -164,7 +167,7 @@ public class TaskController {
     @Operation(summary = "Change task status", description = "Change the status of a specific task")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successful operation"),
-            @ApiResponse(responseCode = "403", description = "Forbidden")
+            @ApiResponse(responseCode = "401", description = "Unauthorized")
     })
     @PutMapping("/{taskId}/status")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
@@ -177,7 +180,7 @@ public class TaskController {
     @Operation(summary = "Delete a task by ID", description = "Delete a specific task by its ID")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "No Content"),
-            @ApiResponse(responseCode = "403", description = "Forbidden")
+            @ApiResponse(responseCode = "401", description = "Unauthorized")
     })
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
@@ -189,7 +192,7 @@ public class TaskController {
     @Operation(summary = "Delete comments from a task", description = "Delete specific comments from a task")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successful operation"),
-            @ApiResponse(responseCode = "403", description = "Forbidden")
+            @ApiResponse(responseCode = "401", description = "Unauthorized")
     })
     @DeleteMapping("/{taskId}/comments")
     @PreAuthorize("hasRole('ADMIN')")
@@ -203,7 +206,7 @@ public class TaskController {
     @Operation(summary = "Delete executors from a task", description = "Delete specific executors from a task")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successful operation"),
-            @ApiResponse(responseCode = "403", description = "Forbidden")
+            @ApiResponse(responseCode = "401", description = "Unauthorized")
     })
     @DeleteMapping("/{taskId}/executors")
     @PreAuthorize("hasRole('ADMIN')")
@@ -212,5 +215,14 @@ public class TaskController {
             @RequestBody List<Long> executorIds) {
         taskService.deleteExecutorsByIds(taskId, executorIds);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/tasks")
+    public Page<Task> getTasksByFilter(@RequestParam(required = false) Status status,
+                                       @RequestParam(required = false) Priority priority,
+                                       @RequestParam(required = false) Long creatorId,
+                                       @RequestParam(required = false) Long executorId,
+                                       Pageable pageable) {
+        return taskService.getTasksByFilter(status, priority, creatorId, executorId, pageable);
     }
 }

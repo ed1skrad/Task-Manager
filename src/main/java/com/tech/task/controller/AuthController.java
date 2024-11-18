@@ -44,11 +44,16 @@ public class AuthController {
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = JwtAuthenticationResponse.class))),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "Forbidden")
     })
     @PostMapping("/signin")
     public ResponseEntity<JwtAuthenticationResponse> signIn(@RequestBody SignInRequest request) {
         JwtAuthenticationResponse jwtResponse = authenticationService.signIn(request);
+        return ResponseEntity.ok(jwtResponse);
+    }
+
+    @PostMapping("/admin")
+    public ResponseEntity<JwtAuthenticationResponse> createAdmin() {
+        JwtAuthenticationResponse jwtResponse = authenticationService.createAdmin();
         return ResponseEntity.ok(jwtResponse);
     }
 }

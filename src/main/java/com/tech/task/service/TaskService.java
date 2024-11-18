@@ -11,7 +11,7 @@ import java.util.List;
 
 public interface TaskService {
 
-    List<TaskResponse> getAllTask();
+    Page<TaskResponse> getAllTasks(Pageable pageable);
 
     void createTask(CreateOrUpdateTaskRequest createTaskRequest, String username);
 
