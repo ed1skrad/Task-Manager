@@ -91,8 +91,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         User user = userService.getByUsername(username);
         Role roleAdmin = roleRepository.findByName(RoleEnum.ROLE_ADMIN)
                 .orElseThrow(() -> new RoleNotFoundException("Error. Role admin not found."));
-
         List<Role> roles = new ArrayList<>();
+        roles.add(roleAdmin);
         user.setRoles(roles);
         userRepository.save(user);
     }
