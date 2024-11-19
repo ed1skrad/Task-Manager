@@ -225,7 +225,7 @@ public class TaskController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/tasks")
+    @GetMapping("/filter")
     public Page<TaskResponse> getTasksByFilter(@RequestParam(required = false) Status status,
                                                @RequestParam(required = false) Priority priority,
                                                @RequestParam(required = false) Long creatorId,
