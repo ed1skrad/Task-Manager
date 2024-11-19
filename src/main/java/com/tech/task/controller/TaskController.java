@@ -8,6 +8,7 @@ import com.tech.task.dto.request.UpdateTaskStatusRequest;
 import com.tech.task.model.Task;
 import com.tech.task.model.state.Priority;
 import com.tech.task.model.state.Status;
+import com.tech.task.repository.config.CustomPageable;
 import com.tech.task.service.impl.TaskServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -49,7 +50,9 @@ public class TaskController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Page<TaskResponse>> getTaskByExecutorId(
             @PathVariable Long id,
-            Pageable pageable) {
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        Pageable pageable = new CustomPageable(page, size);
         Page<TaskResponse> tasks = taskService.getTaskByExecutorId(id, pageable);
         return ResponseEntity.ok(tasks);
     }
@@ -66,7 +69,9 @@ public class TaskController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Page<TaskResponse>> getTaskByCreator(
             @PathVariable Long id,
-            Pageable pageable) {
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        Pageable pageable = new CustomPageable(page, size);
         Page<TaskResponse> tasks = taskService.getTaskByCreator(id, pageable);
         return ResponseEntity.ok(tasks);
     }
@@ -94,7 +99,10 @@ public class TaskController {
     })
     @GetMapping("/all")
     @PreAuthorize("hasRole('ADMIN')")
-    public Page<TaskResponse> getAllTasks(Pageable pageable){
+    public Page<TaskResponse> getAllTasks(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        Pageable pageable = new CustomPageable(page, size);
         return taskService.getAllTasks(pageable);
     }
 

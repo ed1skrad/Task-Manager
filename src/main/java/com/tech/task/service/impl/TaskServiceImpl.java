@@ -21,7 +21,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class TaskServiceImpl implements TaskService {
@@ -66,17 +68,23 @@ public class TaskServiceImpl implements TaskService {
         task.setStatus(updateTaskRequest.getStatus());
         task.setPriority(updateTaskRequest.getPriority());
 
-        List<User> executors = updateTaskRequest.getExecutorsIds() != null ?
-                updateTaskRequest.getExecutorsIds().stream()
-                        .map(userService::getById)
-                        .toList() : List.of();
-        task.setExecutors(executors);
+        List<Long> executorIds = updateTaskRequest.getExecutorsIds();
+        if (executorIds != null) {
+            Set<Long> uniqueExecutorIds = new HashSet<>(executorIds);
+
+            List<User> executors = uniqueExecutorIds.stream()
+                    .map(userService::getById)
+                    .toList();
+
+            task.setExecutors(executors);
+        } else {
+            task.setExecutors(List.of());
+        }
 
         task = taskRepository.save(task);
 
         modelMapper.map(task, TaskResponse.class);
     }
-
     public void deleteTask(Long taskId) {
         taskRepository.deleteById(taskId);
     }
@@ -145,6 +153,7 @@ public class TaskServiceImpl implements TaskService {
 
         List<User> executorsToAssign = executorIds.stream()
                 .map(userService::getById)
+                .filter(executor -> !task.getExecutors().contains(executor))
                 .toList();
 
         task.getExecutors().addAll(executorsToAssign);
