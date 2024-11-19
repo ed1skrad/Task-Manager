@@ -27,9 +27,11 @@ public class Task {
     private String description;
 
     @NotNull(message = "Status is mandatory")
+    @Enumerated(EnumType.STRING)
     private Status status;
 
     @NotNull(message = "Priority is mandatory")
+    @Enumerated(EnumType.STRING)
     private Priority priority;
 
     @ManyToOne

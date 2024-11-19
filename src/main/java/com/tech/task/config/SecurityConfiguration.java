@@ -46,7 +46,7 @@ public class SecurityConfiguration {
                         .ignoringRequestMatchers("/api/**", "/swagger-ui/**", "/swagger-resources/*", "/v3/api-docs/**"))
                 .cors(cors -> cors.configurationSource(request -> {
                     var corsConfiguration = new CorsConfiguration();
-                    corsConfiguration.setAllowedOriginPatterns(List.of("*"));
+                    corsConfiguration.setAllowedOriginPatterns(List.of("https://task-manager.com"));
                     corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
                     corsConfiguration.setAllowedHeaders(List.of("*"));
                     corsConfiguration.setAllowCredentials(true);

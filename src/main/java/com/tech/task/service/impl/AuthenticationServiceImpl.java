@@ -87,27 +87,13 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         return new JwtAuthenticationResponse("Success", request.getEmail(), jwt, refreshToken);
     }
 
-    public JwtAuthenticationResponse createAdmin() {
-        if(userRepository.existsByUsername("admin")) {
-            throw new UsernameTakenException("Error: username is taken!");
-        }
-
-        User user = new User();
-        user.setUsername("admin");
-        user.setEmail("admin@gmail.com");
-        user.setPassword(passwordEncoder.encode("admin"));
-
+    public void changeRole(String username){
+        User user = userService.getByUsername(username);
         Role roleAdmin = roleRepository.findByName(RoleEnum.ROLE_ADMIN)
                 .orElseThrow(() -> new RoleNotFoundException("Error. Role admin not found."));
 
         List<Role> roles = new ArrayList<>();
-        roles.add(roleAdmin);
         user.setRoles(roles);
-
         userRepository.save(user);
-
-        var jwt = jwtService.generateToken(user);
-        var refreshToken = refreshTokenService.generateRefreshToken(user);
-        return new JwtAuthenticationResponse("Admin created successfully!", user.getUsername(), jwt, refreshToken);
     }
 }

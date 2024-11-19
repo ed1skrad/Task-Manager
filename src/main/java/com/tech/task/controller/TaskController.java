@@ -86,7 +86,7 @@ public class TaskController {
     })
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public TaskResponse getTaskById(@PathVariable Long id){
+    public TaskResponse getTaskById(@PathVariable Long id) {
         return taskService.getTaskById(id);
     }
 
@@ -179,7 +179,7 @@ public class TaskController {
     })
     @PutMapping("/{taskId}/status")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    public ResponseEntity<Object> changeTaskStatus(@PathVariable Long taskId, @RequestBody UpdateTaskStatusRequest updateTaskStatusRequest){
+    public ResponseEntity<Object> changeTaskStatus(@PathVariable Long taskId, @RequestBody UpdateTaskStatusRequest updateTaskStatusRequest) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         taskService.updateTaskStatus(taskId, updateTaskStatusRequest, username);
         return ResponseEntity.ok().build();
@@ -226,11 +226,14 @@ public class TaskController {
     }
 
     @GetMapping("/tasks")
-    public Page<Task> getTasksByFilter(@RequestParam(required = false) Status status,
-                                       @RequestParam(required = false) Priority priority,
-                                       @RequestParam(required = false) Long creatorId,
-                                       @RequestParam(required = false) Long executorId,
-                                       Pageable pageable) {
+    public Page<TaskResponse> getTasksByFilter(@RequestParam(required = false) Status status,
+                                               @RequestParam(required = false) Priority priority,
+                                               @RequestParam(required = false) Long creatorId,
+                                               @RequestParam(required = false) Long executorId,
+                                               @RequestParam(defaultValue = "0") int page,
+                                               @RequestParam(defaultValue = "10") int size) {
+
+        Pageable pageable = new CustomPageable(page, size);
         return taskService.getTasksByFilter(status, priority, creatorId, executorId, pageable);
     }
 }

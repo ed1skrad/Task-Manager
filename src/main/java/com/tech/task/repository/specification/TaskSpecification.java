@@ -31,10 +31,13 @@ public class TaskSpecification {
             }
 
             if (executorId != null) {
-                predicates.add(cb.isMember(executorId, root.get("executors")));
+                predicates.add(cb.isTrue(root.join("executors").get("id").in(executorId)));
             }
 
             return cb.and(predicates.toArray(new Predicate[0]));
         };
+    }
+
+    private TaskSpecification() {
     }
 }

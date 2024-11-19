@@ -11,6 +11,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -52,8 +54,10 @@ public class AuthController {
     }
 
     @PostMapping("/admin")
-    public ResponseEntity<JwtAuthenticationResponse> createAdmin() {
-        JwtAuthenticationResponse jwtResponse = authenticationService.createAdmin();
-        return ResponseEntity.ok(jwtResponse);
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<Object> changeRole(){
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        authenticationService.changeRole(username);
+        return ResponseEntity.ok("Role admin has been assigned!");
     }
 }

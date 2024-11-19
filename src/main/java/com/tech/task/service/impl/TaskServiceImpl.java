@@ -187,7 +187,8 @@ public class TaskServiceImpl implements TaskService {
                 task.getExecutors().contains(user);
     }
 
-    public Page<Task> getTasksByFilter(Status status, Priority priority, Long creatorId, Long executorId, Pageable pageable) {
-        return taskRepository.findAll(TaskSpecification.filterTasks(status, priority, creatorId, executorId), pageable);
+    public Page<TaskResponse> getTasksByFilter(Status status, Priority priority, Long creatorId, Long executorId, Pageable pageable) {
+        Page<Task> tasks = taskRepository.findAll(TaskSpecification.filterTasks(status, priority, creatorId, executorId), pageable);
+        return tasks.map(task -> modelMapper.map(task, TaskResponse.class));
     }
 }
