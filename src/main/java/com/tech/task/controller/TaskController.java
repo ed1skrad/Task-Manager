@@ -5,7 +5,6 @@ import com.tech.task.dto.request.CreateOrUpdateTaskRequest;
 import com.tech.task.dto.request.UpdateTaskPriorityRequest;
 import com.tech.task.dto.response.TaskResponse;
 import com.tech.task.dto.request.UpdateTaskStatusRequest;
-import com.tech.task.model.Task;
 import com.tech.task.model.state.Priority;
 import com.tech.task.model.state.Status;
 import com.tech.task.repository.config.CustomPageable;

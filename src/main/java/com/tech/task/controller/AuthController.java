@@ -53,6 +53,7 @@ public class AuthController {
         return ResponseEntity.ok(jwtResponse);
     }
 
+    @Operation(summary = "Assign admin role", description = "Assign admin role to authenticated user")
     @PostMapping("/admin")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<Object> changeRole(){
